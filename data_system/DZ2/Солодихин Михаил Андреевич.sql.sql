@@ -56,8 +56,7 @@ SELECT DISTINCT c.customer_id, c.first_name, c.last_name
 FROM transaction t
 JOIN customers c ON t.customer_id = c.customer_id
 WHERE t.online_order = TRUE
-AND t.brand IN ('Giant Bicycles', 'Norco Bicycles', 'Trek Bicycles')
-LIMIT 10;
+AND t.brand IN ('Giant Bicycles', 'Norco Bicycles', 'Trek Bicycles');
 
 SELECT c.customer_id, c.first_name, c.last_name
 FROM customers c
@@ -77,3 +76,75 @@ JOIN customers c ON t.customer_id = c.customer_id
 WHERE c.job_industry_category IN ('IT', 'Health')
 AND t.order_status = 'Approved'
 AND t.transaction_date BETWEEN '2017-07-07' AND '2017-07-17';
+
+SELECT job_industry_category, COUNT(*) AS customer_count
+FROM customers
+GROUP BY job_industry_category
+ORDER BY customer_count DESC;
+
+SELECT 
+    DATE_TRUNC('month', t.transaction_date) AS transaction_month,
+    c.job_industry_category,
+    SUM(t.list_price) AS total_sales
+FROM transaction t
+JOIN customers c ON t.customer_id = c.customer_id
+GROUP BY transaction_month, c.job_industry_category
+ORDER BY transaction_month, c.job_industry_category;
+
+SELECT t.brand, COUNT(*) AS online_order_count
+FROM transaction t
+JOIN customers c ON t.customer_id = c.customer_id
+WHERE c.job_industry_category = 'IT'
+AND t.online_order = TRUE
+AND t.order_status = 'Approved'
+GROUP BY t.brand
+ORDER BY online_order_count DESC;
+
+SELECT c.customer_id, SUM(t.list_price) AS total_sales, 
+       MAX(t.list_price) AS max_price, 
+       MIN(t.list_price) AS min_price, 
+       COUNT(t.transaction_id) AS transaction_count
+FROM transaction t
+JOIN customers c ON t.customer_id = c.customer_id
+GROUP BY c.customer_id
+ORDER BY total_sales DESC, transaction_count DESC;
+
+SELECT DISTINCT c.customer_id, 
+       SUM(t.list_price) OVER (PARTITION BY c.customer_id) AS total_sales,
+       MAX(t.list_price) OVER (PARTITION BY c.customer_id) AS max_price,
+       MIN(t.list_price) OVER (PARTITION BY c.customer_id) AS min_price,
+       COUNT(t.transaction_id) OVER (PARTITION BY c.customer_id) AS transaction_count
+FROM transaction t
+JOIN customers c ON t.customer_id = c.customer_id
+ORDER BY total_sales DESC, transaction_count DESC;
+
+SELECT c.first_name, c.last_name, SUM(t.list_price) AS total_sales
+FROM transaction t
+JOIN customers c ON t.customer_id = c.customer_id
+GROUP BY c.customer_id, c.first_name, c.last_name
+ORDER BY total_sales ASC;
+
+SELECT c.first_name, c.last_name, SUM(t.list_price) AS total_sales
+FROM transaction t
+JOIN customers c ON t.customer_id = c.customer_id
+GROUP BY c.customer_id, c.first_name, c.last_name
+ORDER BY total_sales DESC;
+
+SELECT DISTINCT ON (t.customer_id) t.customer_id, c.first_name, c.last_name, t.transaction_date, t.list_price
+FROM transaction t
+JOIN customers c ON t.customer_id = c.customer_id
+ORDER BY t.customer_id, t.transaction_date ASC;
+
+WITH transaction_intervals AS (
+    SELECT t.customer_id, 
+           c.first_name, c.last_name, c.job_title,
+           LAG(t.transaction_date) OVER (PARTITION BY t.customer_id ORDER BY t.transaction_date) AS prev_transaction,
+           t.transaction_date,
+           t.transaction_date - LAG(t.transaction_date) OVER (PARTITION BY t.customer_id ORDER BY t.transaction_date) AS interval_days
+    FROM transaction t
+    JOIN customers c ON t.customer_id = c.customer_id
+)
+SELECT customer_id, first_name, last_name, job_title, interval_days
+FROM transaction_intervals
+WHERE interval_days IS NOT NULL
+ORDER BY interval_days DESC;
