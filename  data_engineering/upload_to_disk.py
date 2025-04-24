@@ -1,7 +1,7 @@
 import yadisk
 import pandas as pd
 
-yadisk_token = 'y0__xDB3cogGOSVNyDiku_wEvVoIeoky6BKAFjzE5qb111zE2Gn'
+yadisk_token = ''
 
 def trasfer_to_yadisk():
     # Создаем объект Yadisk

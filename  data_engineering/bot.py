@@ -68,7 +68,7 @@ async def process_message(update: Update, context: CallbackContext) -> None:
     # Собираем запрос
     data = {}
     # Указываем тип модели
-    data["modelUri"] = f"gpt://b1gr9446i4tl08tfuf02/yandexgpt"
+    data["modelUri"] = f"g"
     # Настраиваем опции
     data["completionOptions"] = {"temperature": 0.3, "maxTokens": 1000}
     # Указываем контекст для модели
@@ -100,7 +100,7 @@ async def process_message(update: Update, context: CallbackContext) -> None:
 
 
 def get_iam_token():
-    OAUTH_TOKEN = 'y0__xDB3cogGMHdEyDKwcbwEuBGeatMhcQRIFsfwYK3tuBjAs5g'
+    OAUTH_TOKEN = ''
     response = requests.post(
         'https://iam.api.cloud.yandex.net/iam/v1/tokens',
         json={'yandexPassportOauthToken': OAUTH_TOKEN}
@@ -125,7 +125,7 @@ def log_user_action(user_id: int, action: str) -> None:
 def main() -> None:
     """Start the bot."""
     # Create the Application and pass it your bot's token.
-    application = Application.builder().token("7427862662:AAFLz-XvOyZ9_-4CNew03SEGCJVQVnyBO4w").build()
+    application = Application.builder().token(").build()
     # on different commands - answer in Telegram
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("help", help_command))
