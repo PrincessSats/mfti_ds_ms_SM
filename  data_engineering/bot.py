@@ -100,7 +100,7 @@ async def process_message(update: Update, context: CallbackContext) -> None:
 
 
 def get_iam_token():
-    OAUTH_TOKEN = ''
+    OAUTH_TOKEN = '1'
     response = requests.post(
         'https://iam.api.cloud.yandex.net/iam/v1/tokens',
         json={'yandexPassportOauthToken': OAUTH_TOKEN}
